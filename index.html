@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>115年度臺大醫療體系新進主治醫師與醫事人員研究營</title>
+    <title>115年度臺大醫療體系新進主治醫師與醫事人員研究營滿意度調查</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -12,11 +12,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
         
         :root {
-            --c-primary: #514283;
-            --c-secondary: #cac5ed;
-            --c-light: #e1ddf4;
-            --c-lighter: #dfcff3;
-            --c-accent: #f0c3e2;
+            --c-primary: #534a55;
+            --c-secondary: #5e4a6f;
+            --c-light: #d3b4d3;
+            --c-lighter: #c8b7c9;
+            --c-accent: #5e4a6f;
         }
 
         body {
@@ -39,7 +39,7 @@
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 8px 32px rgba(81, 66, 131, 0.05);
+            box-shadow: 0 8px 32px rgba(83, 74, 85, 0.1);
         }
 
         .tap-effect { transition: transform 0.1s ease, background-color 0.2s; }
@@ -53,7 +53,13 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { deep: '#514283', medium: '#cac5ed', light: '#e1ddf4', pale: '#dfcff3', pink: '#f0c3e2' }
+                        brand: { 
+                            deep: '#534a55', 
+                            medium: '#5e4a6f', 
+                            light: '#d3b4d3', 
+                            pale: '#c8b7c9', 
+                            pink: '#5e4a6f' // Using medium/accent color for highlights
+                        }
                     }
                 }
             }
@@ -72,7 +78,7 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLkbu0cN5XLrcLsFU-pisf-uV5IveVzirsYp63OBEpe_83Q2JSvUh6elauX_YPCuVnfg/exec"; 
         
         // 活動網頁 (返回按鈕用)
-        const EVENT_PAGE_URL = "https://linktr.ee/ntuhmed";
+        const EVENT_PAGE_URL = "https://script.google.com/macros/s/AKfycbyBqro7FWCjJQdmDyesUjDUSPf6ZZVUAhBXBdr2dNL2BJt2N-p62KqJ3A2TWoMzVD4E/exec";
         // =========================================================================
 
         // --- Icons ---
@@ -81,22 +87,23 @@
         const Check = (props) => (<IconWrapper {...props}><polyline points="20 6 9 17 4 12" /></IconWrapper>);
         const Send = (props) => (<IconWrapper {...props}><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></IconWrapper>);
         const Heart = (props) => (<IconWrapper {...props}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></IconWrapper>);
-        const Sparkles = (props) => (<IconWrapper {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M9 3v4" /><path d="M3 5h4" /><path d="M3 9h4" /></IconWrapper>);
+        const Sparkles = (props) => (<IconWrapper {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M9 3v4" /><path d="M3 5h4" /><path d="M3 9h4" /></IconWrapper>);
         const X = (props) => (<IconWrapper {...props}><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></IconWrapper>);
         const User = (props) => (<IconWrapper {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></IconWrapper>);
         const Facebook = (props) => (<IconWrapper {...props}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></IconWrapper>);
         const LinkIcon = (props) => (<IconWrapper {...props}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></IconWrapper>);
         const Home = (props) => (<IconWrapper {...props}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></IconWrapper>);
         const Loader = (props) => (<IconWrapper {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56" /></IconWrapper>);
+        const Close = (props) => (<IconWrapper {...props}><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></IconWrapper>);
 
         // Lecture Data
         const lectureOptions = [
             { title: "醫師與醫事人員科學家之倫理素養", speaker: "蔡甫昌 主任" },
             { title: "教學部講題：教學資源與規範", speaker: "楊志偉 副主任" },
-            { title: "從站穩腳步到精益求精：個人永續發展之路", speaker: "陳慧玲 主任" },
+            { title: "教學部講題：教學實務分享", speaker: "陳慧玲 主任" },
             { title: "個人研究與出國進修分享", speaker: "鐘桂彬 助理教授" },
             { title: "如何發起及執行臨床試驗？", speaker: "劉志銘 教授" },
-            { title: "透過生醫設計流程解決臨床問題", speaker: "黃博浩 副教授" },
+            { title: "臨床 × 研究 × 生活的平衡策略", speaker: "黃博浩 副教授" },
             { title: "臨床與基礎研究的選擇", speaker: "林頌然 主任" },
             { title: "護理部分享", speaker: "鄭靜宜 護理師" },
             { title: "檢驗醫學部分享", speaker: "陳怡婷 醫檢師" },
@@ -112,11 +119,16 @@
         ];
 
         // --- Components ---
+        // Compact Selection Card for Grid Layout
         const SelectionCard = ({ label, selected, onClick }) => (
             <div onClick={onClick} className={`tap-effect p-3 rounded-xl border-2 cursor-pointer flex items-center justify-between group relative overflow-hidden transition-all h-full ${selected ? 'border-brand-deep bg-white shadow-md' : 'border-transparent bg-white/50 hover:bg-white hover:border-brand-medium'}`}>
                 {selected && <div className="absolute inset-0 bg-brand-medium/20 pointer-events-none" />}
                 <span className={`font-medium z-10 text-sm ${selected ? 'text-brand-deep font-bold' : 'text-gray-600'}`}>{label}</span>
-                {selected && <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center bg-brand-deep z-10"><Check size={12} className="text-white" /></div>}
+                {selected && (
+                    <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center bg-brand-deep z-10">
+                        <Check size={12} className="text-white" />
+                    </div>
+                )}
             </div>
         );
 
@@ -132,7 +144,9 @@
                     <div className="flex justify-between items-start mb-4 relative z-10">
                         <h3 className={`font-bold text-lg flex items-center ${error ? 'text-red-600' : 'text-brand-deep'}`}>{title} {required && <span className="text-brand-pink ml-1 text-xs">●</span>}</h3>
                         {value && (
-                            <button onClick={handleClear} className="text-xs flex items-center gap-1 text-gray-400 hover:text-brand-deep transition-colors px-2 py-1 rounded-full hover:bg-brand-light" title="清除選擇"><RotateCcw size={12} /> 重填</button>
+                            <button onClick={handleClear} className="text-xs flex items-center gap-1 text-gray-400 hover:text-brand-deep transition-colors px-2 py-1 rounded-full hover:bg-brand-light" title="清除選擇">
+                                <RotateCcw size={12} /> 重填
+                            </button>
                         )}
                     </div>
                     <div className="grid grid-cols-3 gap-2 relative z-10">
@@ -454,6 +468,3 @@
     </script>
 </body>
 </html>
-
-
-
