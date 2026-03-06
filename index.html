@@ -79,9 +79,6 @@
         
         // 活動網頁 (返回按鈕用)
         const EVENT_PAGE_URL = "https://script.google.com/macros/s/AKfycbyBqro7FWCjJQdmDyesUjDUSPf6ZZVUAhBXBdr2dNL2BJt2N-p62KqJ3A2TWoMzVD4E/exec";
-        
-        // 系統開放時間 (格式：YYYY-MM-DDTHH:mm:ss)
-        const SYSTEM_OPEN_TIME = "2026-03-06T08:00:00";
         // =========================================================================
 
         // --- Icons ---
@@ -97,9 +94,7 @@
         const LinkIcon = (props) => (<IconWrapper {...props}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></IconWrapper>);
         const Home = (props) => (<IconWrapper {...props}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></IconWrapper>);
         const Loader = (props) => (<IconWrapper {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56" /></IconWrapper>);
-        const Close = (props) => (<IconWrapper {...props}><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></IconWrapper>);
         const Clock = (props) => (<IconWrapper {...props}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></IconWrapper>);
-        const Lock = (props) => (<IconWrapper {...props}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></IconWrapper>);
 
         // Lecture Data
         const lectureOptions = [
@@ -113,7 +108,7 @@
             { title: "護理部分享", speaker: "鄭靜宜 護理師" },
             { title: "檢驗醫學部分享", speaker: "陳怡婷 醫檢師" },
             { title: "藥劑部分享", speaker: "林欣儀 藥師" },
-            { title: "讓種子發光：總分院育苗計畫分享", speaker: "楊偉勛 教授" },
+            { title: "讓種子發光：總分院育苗計畫分享", speaker: "楊偉勛 教授 / 李志國 助理教授" },
             { title: "院內研究資源－共同研究室與研究服務核心", speaker: "蔡芷季 組長" },
             { title: "院內計畫簡介懶人包", speaker: "楊鎧鍵 組長" },
             { title: "使用醫療整合資料創新研發", speaker: "李宜家 副主任" },
@@ -169,7 +164,7 @@
         // --- Main App ---
         const App = () => {
             const [formData, setFormData] = useState({
-                campus: "", role: "", lectureDifficulty: "", lecturePracticality: "", lectureTime: "", lectureAttraction: "", lectureCompleteness: "",
+                campus: "", branchCampus: "", role: "", lectureDifficulty: "", lecturePracticality: "", lectureTime: "", lectureAttraction: "", lectureCompleteness: "",
                 bestLectures: [], touchingSpeaker: "", researchHelp: "", foundPartner: "", partnerCount: "",
                 venueComfort: "", transport: "", serviceQuality: "", foodQuality: "", accomodation: "",
                 futureTiming: "", suggestions: "", overallSatisfaction: ""
@@ -177,30 +172,19 @@
             const [submitted, setSubmitted] = useState(false);
             const [isSubmitting, setIsSubmitting] = useState(false);
             const [errors, setErrors] = useState({});
-            const [isSystemOpen, setIsSystemOpen] = useState(false); // 控制系統開放
+            
             const scrollRef = useRef(null);
-
-            // Check system time on load
-            useEffect(() => {
-                const checkTime = () => {
-                    const now = new Date();
-                    const openDate = new Date(SYSTEM_OPEN_TIME);
-                    setIsSystemOpen(now >= openDate);
-                };
-                checkTime();
-                // Optional: interval check if user stays on page until open time
-                const timer = setInterval(checkTime, 60000); 
-                return () => clearInterval(timer);
-            }, []);
 
             const handleValueChange = (name, value) => {
                 setFormData(prev => ({ ...prev, [name]: prev[name] === value ? "" : value }));
                 if (value) setErrors(prev => ({ ...prev, [name]: false }));
             };
+
             const handleRatingChange = (name, value) => {
                 setFormData(prev => ({ ...prev, [name]: value }));
                 if (value) setErrors(prev => ({ ...prev, [name]: false }));
             };
+
             const handleCheckboxChange = (value) => {
                 setFormData(prev => {
                     const current = prev.bestLectures;
@@ -216,7 +200,7 @@
                 const newErrors = {};
                 let isValid = true;
                 const fieldNames = {
-                    campus: '服務院區', role: '參加身分', lectureDifficulty: '講題難易度', lecturePracticality: '講題實用性', lectureTime: '講題時間規劃',
+                    campus: '服務院區', branchCampus: '分院選項', role: '參加身分', lectureDifficulty: '講題難易度', lecturePracticality: '講題實用性', lectureTime: '講題時間規劃',
                     lectureAttraction: '內容吸引力', lectureCompleteness: '課程規劃完整性', researchHelp: '對研究有幫助', foundPartner: '是否找到合作夥伴', 
                     partnerCount: '合作夥伴人數', venueComfort: '場地舒適性', transport: '交通便利性', serviceQuality: '服務品質',
                     foodQuality: '用餐環境品質', accomodation: '住宿舒適度', futureTiming: '建議辦理時間', overallSatisfaction: '整體滿意度'
@@ -242,6 +226,12 @@
                     missingFields.push(fieldNames['partnerCount']);
                 }
 
+                if (formData.campus === '分院' && !formData.branchCampus) {
+                    newErrors.branchCampus = true;
+                    isValid = false;
+                    missingFields.push(fieldNames['branchCampus']);
+                }
+
                 setErrors(newErrors);
                 return { isValid, missingFields };
             };
@@ -257,10 +247,14 @@
 
                 setIsSubmitting(true);
 
-                // Use fetch for external calls
+                const submitData = { ...formData };
+                if (submitData.campus === '分院' && submitData.branchCampus) {
+                    submitData.campus = `分院 (${submitData.branchCampus})`;
+                }
+
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify(formData),
+                    body: JSON.stringify(submitData),
                     headers: {
                         'Content-Type': 'text/plain;charset=utf-8', 
                     },
@@ -277,34 +271,6 @@
                     setIsSubmitting(false);
                 });
             };
-
-            // Not Open Yet Screen
-            if (!isSystemOpen) {
-                return (
-                    <div className="min-h-screen bg-brand-light flex flex-col items-center justify-center p-6 text-center">
-                        <div className="glass-card p-8 rounded-[2rem] max-w-md w-full shadow-2xl shadow-brand-deep/20 border border-white/50 anim-scale-in">
-                            <div className="w-20 h-20 bg-brand-pale rounded-full flex items-center justify-center mx-auto mb-6 relative">
-                                <Lock size={36} className="text-brand-deep" />
-                                <div className="absolute inset-0 rounded-full border-4 border-brand-accent opacity-30 animate-pulse"></div>
-                            </div>
-                            <h2 className="text-2xl font-bold text-brand-deep mb-2">系統尚未開放</h2>
-                            <p className="text-gray-600 mb-6 text-sm">本問卷填寫系統將於開放時間後啟用，<br/>敬請稍候。</p>
-                            
-                            <div className="bg-white/60 rounded-xl p-4 mb-6 border border-brand-medium/20">
-                                <p className="text-xs text-brand-deep/70 uppercase tracking-widest mb-1">開放時間</p>
-                                <p className="text-lg font-bold text-brand-deep flex items-center justify-center gap-2">
-                                    <Clock size={18} className="text-brand-pink"/>
-                                    2026/03/06 08:00
-                                </p>
-                            </div>
-
-                            <button onClick={() => window.location.reload()} className="w-full bg-brand-deep active:bg-brand-deep/90 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 tap-effect">
-                                <RotateCcw size={18} /> 重新整理頁面
-                            </button>
-                        </div>
-                    </div>
-                );
-            }
 
             if (submitted) {
                 return (
@@ -367,6 +333,7 @@
                                 <h2 className="text-xs font-medium text-brand-deep/70 leading-tight mt-0.5">新進主治醫師與醫事人員研究營</h2>
                             </div>
                         </div>
+                        
                         <div className="flex-1 overflow-y-auto p-4 space-y-8 pb-28 no-scrollbar" ref={scrollRef}>
                             <div className="bg-brand-deep rounded-[2rem] p-6 text-white shadow-xl shadow-brand-deep/20 relative overflow-hidden group">
                                 <div className="absolute -right-4 -top-4 w-32 h-32 bg-brand-accent rounded-full blur-2xl opacity-40 group-hover:scale-110 transition-transform duration-700"></div>
@@ -382,11 +349,11 @@
                                     </div>
                                 </div>
                             </div>
+                            
                             <div>
-                                <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 ml-2 flex items-center gap-2 ${errors.role || errors.campus ? 'text-red-500' : 'text-brand-deep/60'}`}><span className={`w-1 h-1 rounded-full ${errors.role || errors.campus ? 'bg-red-500' : 'bg-brand-deep'}`}></span>基本資料 {(errors.role || errors.campus) && '(必填)'}</h3>
-                                <div className={`p-4 rounded-2xl bg-white/50 space-y-4 ${errors.role || errors.campus ? 'border border-red-200 bg-red-50/50' : ''}`}>
+                                <h3 className={`text-xs font-bold uppercase tracking-widest mb-4 ml-2 flex items-center gap-2 ${errors.role || errors.campus || errors.branchCampus ? 'text-red-500' : 'text-brand-deep/60'}`}><span className={`w-1 h-1 rounded-full ${errors.role || errors.campus || errors.branchCampus ? 'bg-red-500' : 'bg-brand-deep'}`}></span>基本資料 {(errors.role || errors.campus || errors.branchCampus) && '(必填)'}</h3>
+                                <div className={`p-4 rounded-2xl bg-white/50 space-y-4 ${errors.role || errors.campus || errors.branchCampus ? 'border border-red-200 bg-red-50/50' : ''}`}>
                                     
-                                    {/* Campus Selection */}
                                     <div>
                                         <label className="block text-sm font-bold text-brand-deep mb-2">服務院區</label>
                                         <div className="flex gap-2">
@@ -394,16 +361,36 @@
                                                 <button 
                                                     key={opt}
                                                     type="button"
-                                                    onClick={() => handleValueChange('campus', opt)}
+                                                    onClick={() => {
+                                                        handleValueChange('campus', opt);
+                                                        if (opt === '總院') handleValueChange('branchCampus', '');
+                                                    }}
                                                     className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all duration-200 border-2 ${formData.campus === opt ? 'bg-brand-deep text-white border-brand-deep shadow-md' : 'bg-white text-gray-500 border-transparent hover:border-brand-medium'}`}
                                                 >
                                                     {opt}
                                                 </button>
                                             ))}
                                         </div>
+                                        
+                                        {formData.campus === '分院' && (
+                                            <div className="mt-3 anim-scale-in">
+                                                <label className={`block text-xs font-bold mb-2 ${errors.branchCampus ? 'text-red-500' : 'text-brand-deep/80'}`}>請選擇分院 {errors.branchCampus && '(必填)'}</label>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {["北護", "金山", "癌醫", "新竹", "雲林"].map(opt => (
+                                                        <button 
+                                                            key={opt}
+                                                            type="button"
+                                                            onClick={() => handleValueChange('branchCampus', opt)}
+                                                            className={`flex-1 min-w-[60px] py-1.5 rounded-lg text-sm font-medium transition-all duration-200 border-2 ${formData.branchCampus === opt ? 'bg-brand-secondary text-white border-brand-secondary shadow-sm' : 'bg-white text-gray-500 border-transparent hover:border-brand-medium'}`}
+                                                        >
+                                                            {opt}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    {/* Role Selection (Grid) */}
                                     <div>
                                         <label className="block text-sm font-bold text-brand-deep mb-2">參加身分</label>
                                         <div className="grid grid-cols-2 gap-2">
@@ -414,6 +401,7 @@
                                     </div>
                                 </div>
                             </div>
+                            
                             <div>
                                 <h3 className="text-brand-deep/60 text-xs font-bold uppercase tracking-widest mb-4 ml-2 flex items-center gap-2"><span className="w-1 h-1 bg-brand-deep rounded-full"></span>講題評價</h3>
                                 <RatingBlock title="講題難易度" value={formData.lectureDifficulty} onChange={v => handleRatingChange('lectureDifficulty', v)} required error={errors.lectureDifficulty} />
@@ -422,6 +410,7 @@
                                 <RatingBlock title="內容吸引力" value={formData.lectureAttraction} onChange={v => handleRatingChange('lectureAttraction', v)} required error={errors.lectureAttraction} />
                                 <RatingBlock title="課程規劃完整性" value={formData.lectureCompleteness} onChange={v => handleRatingChange('lectureCompleteness', v)} required error={errors.lectureCompleteness} />
                             </div>
+                            
                             <div>
                                 <h3 className="text-brand-deep/60 text-xs font-bold uppercase tracking-widest mb-4 ml-2 flex items-center gap-2"><span className="w-1 h-1 bg-brand-deep rounded-full"></span>最有收穫課程 (可多選)</h3>
                                 <div className="space-y-3">
@@ -442,6 +431,7 @@
                                     })}
                                 </div>
                             </div>
+                            
                             <div>
                                 <h3 className="text-brand-deep/60 text-xs font-bold uppercase tracking-widest mb-4 ml-2 flex items-center gap-2"><span className="w-1 h-1 bg-brand-deep rounded-full"></span>深度回饋</h3>
                                 <div className="glass-card rounded-[2rem] p-6 space-y-6">
@@ -476,6 +466,7 @@
                                     </div>
                                 </div>
                             </div>
+                            
                             <div>
                                 <h3 className="text-brand-deep/60 text-xs font-bold uppercase tracking-widest mb-4 ml-2 flex items-center gap-2"><span className="w-1 h-1 bg-brand-deep rounded-full"></span>行政與場地</h3>
                                 <RatingBlock title="場地舒適性" value={formData.venueComfort} onChange={v => handleRatingChange('venueComfort', v)} required error={errors.venueComfort} />
@@ -484,6 +475,7 @@
                                 <RatingBlock title="用餐環境品質" value={formData.foodQuality} onChange={v => handleRatingChange('foodQuality', v)} required error={errors.foodQuality} />
                                 <RatingBlock title="住宿舒適度" value={formData.accomodation} onChange={v => handleRatingChange('accomodation', v)} required error={errors.accomodation} />
                             </div>
+                            
                             <div>
                                 <h3 className="text-brand-deep/60 text-xs font-bold uppercase tracking-widest mb-4 ml-2 flex items-center gap-2"><span className="w-1 h-1 bg-brand-deep rounded-full"></span>未來與總結</h3>
                                 <div className="glass-card rounded-[2rem] p-6 space-y-8">
@@ -502,6 +494,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div className="absolute bottom-0 left-0 right-0 p-4 pb-8 z-50 pointer-events-none">
                             <div className="pointer-events-auto glass-header rounded-[2rem] p-2 shadow-2xl shadow-brand-deep/20 border border-white/50">
                                 <button onClick={handleSubmit} disabled={isSubmitting} className={`w-full bg-brand-deep text-white font-bold py-4 rounded-3xl shadow-lg shadow-brand-deep/30 flex items-center justify-center gap-2 text-lg tap-effect transition-all ${isSubmitting ? 'opacity-80 cursor-wait' : 'active:bg-brand-deep/90 active:scale-95'}`}>
@@ -519,4 +512,3 @@
     </script>
 </body>
 </html>
-
